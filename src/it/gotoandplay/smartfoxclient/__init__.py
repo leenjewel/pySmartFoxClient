@@ -7,11 +7,9 @@ Created on 2010-11-8
 
 from it.gotoandplay.utils.xmlsocket import XMLSocket
 from it.gotoandplay.utils.xmllib import XMLObj
+from it.gotoandplay.smartfoxclient.sfseventdispatcher import SFSEventDispatcher
 
-class SFSEvent(object):
-    pass
-
-class SmartFoxClient(object):
+class SmartFoxClient(SFSEventDispatcher):
     
     VER = "158"
 
@@ -32,7 +30,8 @@ class SmartFoxClient(object):
     
     def __init__(self, debug = False):
         self.debug = debug
-        self.event_control = {}
+        self.connected = False
+        super(SmartFoxClient, self).__init__()
     
     def connect(self, server_host, server_port):
         self.socket_client = XMLSocket()
@@ -40,8 +39,8 @@ class SmartFoxClient(object):
         self.socket_client.connect(server_host, server_port)
         return
     
-    def addEventListener(self, event_name, event_obj):
-        self.event_control[event_name] = event_obj
+    def setConnected(self, connected):
+        self.connected = connected
         return
     
     def print_debug(self, data):
@@ -49,13 +48,21 @@ class SmartFoxClient(object):
             print data
         return
     
-    def send(self, header, action, from_room, message):
+    def send(self, header, action, from_room, message = None):
         xml_msg = self.makeXmlHeader(header)
         xml_msg["body"] = None
         xml_msg.body.set_attribute({"action":action, "r":str(from_room)})
-        xml_msg.body += message
+        if message:
+            xml_msg.body += message
         self.print_debug("[Sending] "+xml_msg.to_string())
         self.socket_client.sendXMLObj(xml_msg)
+        return
+    
+    def xmlReceived(self, xml_str):
+        xml_obj = XMLObj.build_from_str(xml_str)
+        header_id = xml_obj.xml_attr.get("t")
+        if header_id:
+            pass
         return
     
     def makeXmlHeader(self, header):
@@ -63,6 +70,13 @@ class SmartFoxClient(object):
         xml_msg = XMLObj.build_from_str(xml_head)
         xml_msg.set_attribute({"t":header})
         return xml_msg
+    
+    def addBuddy(self, buddy_name):
+        return
+    
+    def getRandomKey(self):
+        self.send(self.MESSAGE_HEADER_SYSTEM, "rndK", -1, None)
+        return
         
     
     def onConnection(self):

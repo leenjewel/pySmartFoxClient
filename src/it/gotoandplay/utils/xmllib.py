@@ -70,6 +70,9 @@ class XMLBase(object):
             if en.nodeType == en.CDATA_SECTION_NODE and not en.data.isspace():
                 return en.data
         return None
+    
+    def get_data(self):
+        return self.get_cdata() or self.get_text()
 
     def delete_element(self, e_name, e_dict = None, e_num = None):
         result = self.get_elements(self, e_name, e_dict)
