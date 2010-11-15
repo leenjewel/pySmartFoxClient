@@ -6,7 +6,6 @@ Created on 2010-11-15
 '''
 
 from it.gotoandplay.utils.xmllib import XMLObj
-from it.gotoandplay.smartfoxclient import SmartFoxClient
 from it.gotoandplay.smartfoxclient.sfsevent import SFSEvent
 
 class ExtHandler(object):
@@ -15,6 +14,7 @@ class ExtHandler(object):
         self.sfc = sfc
     
     def handleMessage(self, msg_obj, obj_type = None):
+        from it.gotoandplay.smartfoxclient import SmartFoxClient
         params = {}
         if obj_type == SmartFoxClient.XTMSG_TYPE_XML:
             body = msg_obj.body

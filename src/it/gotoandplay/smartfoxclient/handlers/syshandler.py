@@ -31,19 +31,21 @@ class SysHandler(object):
         return changed_vars
 
     def handleMessage(self, xml_obj, obj_type = None):
-        action = xml_obj.body.xml_attr("action")
+        action = xml_obj.body.xml_attr.get("action")
+        print "///////","handle_"+action,"|",hasattr(self, "handle_"+action)
         if action and hasattr(self, "handle_"+action):
             func = getattr(self, "handle_"+action)
+            print "*-*-*-*-",func
             return func(xml_obj)
         return
     
     def handle_apiOK(self, xml_obj):
-        evt = SFSEvent(SFSEvent.onConnected, {"success":True})
+        evt = SFSEvent(SFSEvent.onConnection, {"success":True})
         self.sfc.dispatchEvent(evt)
         return
     
     def handle_apiKO(self, xml_obj):
-        evt = SFSEvent(SFSEvent.onConnected, {"success":False, "error":"API are obsolete, please upgrade"})
+        evt = SFSEvent(SFSEvent.onConnection, {"success":False, "error":"API are obsolete, please upgrade"})
         self.sfc.dispatchEvent(evt)
         return
 
@@ -167,7 +169,7 @@ class SysHandler(object):
             self.populateVariables(newUser.getVariables(), user)
         currRoom.addUser(newUser, userId)
         evt = SFSEvent(SFSEvent.onUserEnterRoom, {"roomId":roomId, "user":newUser})
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_userGone(self, xml_obj):
@@ -182,7 +184,7 @@ class SysHandler(object):
         params["userId"] = userId
         params["userName"] = uName
         evt = SFSEvent(SFSEvent.onUserLeaveRoom, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_pubMsg(self, xml_obj):
@@ -197,7 +199,7 @@ class SysHandler(object):
         params["sender"] = sender
         params["message"] = message
         evt = SFSEvent(SFSEvent.onPublicMessage, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_prvMsg(self, xml_obj):
@@ -212,14 +214,14 @@ class SysHandler(object):
         params["sender"] = sender
         params["message"] = message
         evt = SFSEvent(SFSEvent.onPrivateMessage, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_dmnMsg(self, xml_obj):
         body = xml_obj.body
         message = body.txt.get_data()
         evt = SFSEvent(SFSEvent.onAdminMessage, {"message":message})
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_modMsg(self, xml_obj):
@@ -236,7 +238,7 @@ class SysHandler(object):
         params["sender"] = sender
         params["message"] = message
         evt = SFSEvent(SFSEvent.onModeratorMessage, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_dataObj(self, xml_obj):
@@ -251,7 +253,7 @@ class SysHandler(object):
         params["sender"] = sender
         params["obj"] = xmlObj
         evt = SFSEvent(SFSEvent.onObjectReceived, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_rVarsUpdate(self, xml_obj):
@@ -264,7 +266,7 @@ class SysHandler(object):
         params["room"] = currRoom
         params["changedVars"] = changedVars
         evt = SFSEvent(SFSEvent.onRoomVariablesUpdate, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_roomAdd(self, xml_obj):
@@ -291,7 +293,7 @@ class SysHandler(object):
         params = {}
         params["room"] = newRoom
         evt = SFSEvent(SFSEvent.onRoomAdded, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_roomDel(self, xml_obj):
@@ -302,16 +304,16 @@ class SysHandler(object):
         params = {}
         params["room"] = roomList.pop(roomId)
         evt = SFSEvent(SFSEvent.onRoomDeleted, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
-    def handle_rndk(self, xml_obj):
+    def handle_rndK(self, xml_obj):
         body = xml_obj.body
         key = body.k.get_data()
         params = {}
         params["key"] = key
         evt = SFSEvent(SFSEvent.onRandomKey, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_roundTripRes(self, xml_obj):
@@ -320,7 +322,7 @@ class SysHandler(object):
         params = {}
         params["elapsed"] = res
         evt = SFSEvent(SFSEvent.onRoundTripResponse, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_uVarsUpdate(self, xml_obj):
@@ -339,7 +341,7 @@ class SysHandler(object):
         params["user"] = returnUser
         params["changedVars"] = changedVars
         evt = SFSEvent(SFSEvent.onUserVariablesUpdate, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_createRmKO(self, xml_obj):
@@ -349,7 +351,7 @@ class SysHandler(object):
         params = {}
         params["error"] = errMsg
         evt = SFSEvent(SFSEvent.onCreateRoomError, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_bList(self, xml_obj):
@@ -387,7 +389,7 @@ class SysHandler(object):
             params = {}
             params["error"] = err.get_data()
             evt = SFSEvent(SFSEvent.onBuddyListError, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_bUpd(self, xml_obj):
@@ -425,7 +427,7 @@ class SysHandler(object):
             err = body.err
             params["error"] = err.get_data()
             evt = SFSEvent(SFSEvent.onBuddyListError, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_bAdd(self, xml_obj):
@@ -450,7 +452,7 @@ class SysHandler(object):
         self.sfc.buddyList.append(buddy)
         params = {"list":self.sfc.buddyList}
         evt = SFSEvent(SFSEvent.onBuddyList, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_roomB(self, xml_obj):
@@ -460,7 +462,7 @@ class SysHandler(object):
         ids = [int(ids) for ids in idStr]
         params = {"idList":ids}
         evt = SFSEvent(SFSEvent.onBuddyRoom, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_leaveRoom(self, xml_obj):
@@ -469,7 +471,7 @@ class SysHandler(object):
         roomLeft = int(rm.xml_attr.get("id", -1))
         params = {"roomId":roomLeft}
         evt = SFSEvent(SFSEvent.onRoomLeft, params)
-        self.dispatchEvent(evt)
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_swSpec(self, xml_obj):
@@ -490,7 +492,7 @@ class SysHandler(object):
         else:
             self.sfc.playerId = playerId
             evt = SFSEvent.build_evt(SFSEvent.onSpectatorSwitched, self.sfc.playerId > 0, newId = self.sfc.playerId, room = theRoom)
-            self.dispatchEvent(evt)
+            self.sfc.dispatchEvent(evt)
         return
 
     def handle_swPl(self, xml_obj):
@@ -511,7 +513,7 @@ class SysHandler(object):
         else:
             self.sfc.playerId = playerId
             evt = SFSEvent.build_evt(SFSEvent.onPlayerSwitched, self.sfc.playerId == -1, newId = self.sfc.playerId, room = theRoom)
-            self.dispatchEvent(evt)
+            self.sfc.dispatchEvent(evt)
         return
 
     def handle_bPrm(self, xml_obj):

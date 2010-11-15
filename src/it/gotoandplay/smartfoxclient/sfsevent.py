@@ -7,7 +7,7 @@ Created on 2010-11-13
 
 class SFSEvent(object):
     
-    onConnected = "onConnected"
+    onConnection = "onConnection"
     onLogin = "onLogin"
     onLogout = "onLogout"
     onRoomListUpdate = "onRoomListUpdate"

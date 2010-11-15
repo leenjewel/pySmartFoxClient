@@ -89,6 +89,7 @@ class SmartFoxClient(SFSEventDispatcher):
         return
     
     def xmlReceived(self, xml_str):
+        xml_str = xml_str.replace("\0", "")
         xml_obj = XMLObj.build_from_str(xml_str)
         header_id = xml_obj.xml_attr.get("t")
         if header_id and self.messageHandlers.has_key(header_id):
