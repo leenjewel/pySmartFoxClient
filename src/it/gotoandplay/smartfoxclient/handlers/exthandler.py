@@ -25,7 +25,7 @@ class ExtHandler(object):
                 evt = SFSEvent(SFSEvent.onExtensionResponse, params)
                 self.sfc.dispatchEvent(evt)
         elif obj_type == SmartFoxClient.XTMSG_TYPE_JSON:
-            params["dataObj"] = msg_obj
+            params["dataObj"] = msg_obj.get("o")
             params["type"] = obj_type
             evt = SFSEvent(SFSEvent.onExtensionResponse, params)
             self.sfc.dispatchEvent(evt)

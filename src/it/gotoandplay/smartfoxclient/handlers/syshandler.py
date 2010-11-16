@@ -32,10 +32,8 @@ class SysHandler(object):
 
     def handleMessage(self, xml_obj, obj_type = None):
         action = xml_obj.body.xml_attr.get("action")
-        print "///////","handle_"+action,"|",hasattr(self, "handle_"+action)
         if action and hasattr(self, "handle_"+action):
             func = getattr(self, "handle_"+action)
-            print "*-*-*-*-",func
             return func(xml_obj)
         return
     

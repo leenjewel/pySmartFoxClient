@@ -11,11 +11,11 @@ from it.gotoandplay.utils.threadevent import ThreadEvent
 
 class SocketClientProtocol(protocol.Protocol):
     def connectionMade(self):
-        ThreadEvent.build_event(self.factory, "handleEvent", "onConnection", self)
+        self.factory.handleEvent("onConnection", self)
         return
 
     def dataReceived(self, data):
-        ThreadEvent.build_event(self.factory, "handleEvent", "onDataReceived", data)
+        self.factory.handleEvent("onDataReceived", data)
         return
 
 class SocketClientFactory(protocol.ClientFactory):
@@ -26,8 +26,9 @@ class SocketClientFactory(protocol.ClientFactory):
         return
     
     def handleEvent(self, func_name, *args, **kwargs):
-        if self.event_obj:
-            ThreadEvent.build_event(self.event_obj, func_name, *args, **kwargs)
+        if self.event_obj and hasattr(self.event_obj, func_name):
+            func = getattr(self.event_obj, func_name)
+            func(*args, **kwargs)
         return
 
 def build_connect(event_obj, server_host, server_port):

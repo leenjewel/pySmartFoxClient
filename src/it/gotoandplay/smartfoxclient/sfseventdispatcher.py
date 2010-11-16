@@ -27,5 +27,5 @@ class SFSEventDispatcher(object):
         if self.listeners.has_key(event_name):
             listeners = self.listeners[event_name]
             for listener in listeners:
-                ThreadEvent.build_event(listener, "handleEvent", event_obj)
+                listener.handleEvent(event_obj)
         return

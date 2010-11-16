@@ -6,7 +6,6 @@ Created on 2010-11-12
 '''
 
 from it.gotoandplay.utils.twistedsocket import build_connect
-from it.gotoandplay.utils.threadevent import ThreadEvent
 
 class XMLSocket(object):
     
@@ -28,11 +27,11 @@ class XMLSocket(object):
     
     def onConnection(self, socket_client):
         self.socket_client = socket_client
-        ThreadEvent.build_event(self.event_obj, "onConnection")
+        self.event_obj.onConnection()
         return
     
     def onDataReceived(self, data):
-        ThreadEvent.build_event(self.event_obj, "onDataReceived", data)
+        self.event_obj.onDataReceived(data)
         return
     
     def addEventListener(self, event_obj):
