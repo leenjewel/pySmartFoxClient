@@ -17,7 +17,7 @@ class SFSClient(object):
     _sfs_port = 9449
     _api_url = "http://yuanpeng.haalee.com/"
     _user_id = "1835554439"
-    _session_value = "f2c8fbbd48ce259999861c7b3b7a6718"
+    _session_value = "1d34e96f19c4b3b804f7c52ee463a4c8"
     _event_handles = (SFSEvent.onLogin, SFSEvent.onRandomKey, SFSEvent.onExtensionResponse, SFSEvent.onConnection, 
                       SFSEvent.onRoomListUpdate,)
     

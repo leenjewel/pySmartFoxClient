@@ -5,8 +5,6 @@ Created on 2010-11-13
 @author: leenjewel
 '''
 
-from it.gotoandplay.utils.threadevent import ThreadEvent
-
 class SFSEventDispatcher(object):
     def __init__(self):
         self.listeners = {}

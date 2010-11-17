@@ -139,7 +139,7 @@ class XMLObj(XMLBase):
         return cls(xml_base.root_element, xml_base.xml_dom)
     
     def append(self, xml_obj):
-        if xml_obj.root_element.node_name == self.my_name:
+        if xml_obj.root_element.nodeName == self.my_name:
             self.my_brothers.append(xml_obj)
         else:
             print "It's not my brother"
@@ -189,9 +189,3 @@ class XMLObj(XMLBase):
     
     def get(self, key, default_value):
         return self.__dict__.get(key, default_value)
-
-if __name__ == "__main__":
-    leen = XMLObj.build_from_str("<people></people>")
-    work = XMLObj.build_from_str("<work><job name='programmer'/><company>rekoo</company></work>")
-    leen += work
-    print leen

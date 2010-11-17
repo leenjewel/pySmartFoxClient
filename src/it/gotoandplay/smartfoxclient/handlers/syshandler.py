@@ -93,8 +93,8 @@ class SysHandler(object):
                 roomobj.setVariables(old_room.getVariables())
                 roomobj.setUserList(old_room.getUserList())
             room_list[room_id] = roomobj
-            evt = SFSEvent(SFSEvent.onRoomListUpdate, {"roomList":room_list})
-            self.sfc.dispatchEvent(evt)
+        evt = SFSEvent(SFSEvent.onRoomListUpdate, {"roomList":room_list})
+        self.sfc.dispatchEvent(evt)
         return
 
     def handle_uCount(self, xml_obj):

@@ -85,7 +85,6 @@ class SmartFoxClient(SFSEventDispatcher):
         return
     
     def handleMessage(self, data):
-        data = data.replace("\0", "")
         charT = data[0]
         if charT == SmartFoxClient.MSG_XML:
             self.xmlReceived(data)
@@ -205,6 +204,30 @@ class SmartFoxClient(SFSEventDispatcher):
         if t:
             return "<var n='" + vName + "' t='" + t + "' pr='" + vPrivate + "' pe='" + vPersistent + "'><![CDATA[" + vValue + "]]></var>"
         return ""
+    
+    def getXmlUserVariable(self, uVars):
+        xmlStr = "<vars>"
+        for key, uVal in uVars.items():
+            val = uVal.getValue()
+            uType = uVal.getType()
+            t = None
+            if uType == "boolean":
+                t = "b"
+                if val:
+                    val = "1"
+                else:
+                    val = "0"
+            elif uType == "number":
+                t = "n"
+            elif uType == "string":
+                t = "s"
+            elif val is None:
+                t = "x"
+                val = ""
+            if t:
+                xmlStr += "<var n='" + key + "' t='" + t + "'><![CDATA[" + val + "]]></var>"
+            xmlStr += "</vars>"
+            return xmlStr
     
     def createRoom(self, name, maxUsers, roomProperties, roomId = -1):
         if self.checkRoomList() is False or self.checkJoin() is False:
@@ -433,6 +456,51 @@ class SmartFoxClient(SFSEventDispatcher):
                 self.dispatchEvent(evt)
         return
     
+    def setBuddyVariables(self, varList):
+        xmlMsg = XMLObj.build_from_str("<vars></vars>")
+        for vName, vValue in varList.items():
+            self.myBuddyVars[vName] = vValue
+            xmlMsg += "<var n='" + vName + "'><![CDATA[" + vValue + "]]></var>"
+        self.send(self.MESSAGE_HEADER_SYSTEM, "setBvars", -1, xmlMsg)
+        return
+    
+    def setRoomVariables(self, vars, roomId = None, setOwnership = True):
+        if roomId is None:
+            roomId = self.activeRoomId
+        if self.checkRoomList() and self.checkJoin():
+            if setOwnership:
+                xmlMsg = XMLObj.build_from_str("<vars></vars>")
+            else:
+                xmlMsg = XMLObj.build_from_str("<vars so='0'></vars>")
+            for varName, varValue in vars.items():
+                xmlMsg += self.getXmlRoomVariable(varName, varValue)
+            self.send(self.MESSAGE_HEADER_SYSTEM, "setRvars", roomId, xmlMsg)
+        return
+    
+    def setUserVariables(self, vars, roomId = None):
+        if roomId is None:
+            roomId = self.activeRoomId
+        if self.checkRoomList() and self.checkJoin():
+            currRoom = self.getActiveRoom()
+            user = currRoom.getUser(self.myUserId)
+            user.setVariables(vars)
+            xmlMsg = self.getXmlUserVariable(vars)
+            self.send(self.MESSAGE_HEADER_SYSTEM, "setUvars", roomId, xmlMsg)
+        return
+    
+    def switchSpectator(self, roomId = None):
+        if roomId is None:
+            roomId = self.activeRoomId
+        if self.checkRoomList() and self.checkJoin():
+            self.send(self.MESSAGE_HEADER_SYSTEM, "swSpec", roomId, "")
+        return
+    
+    def switchPlayer(self, roomId = None):
+        if roomId is None:
+            roomId = self.activeRoomId
+        self.send(self.MESSAGE_HEADER_SYSTEM, "swPl", roomId, None)
+        return
+    
     def onConnection(self):
         self.print_debug("onConnection")
         xml_msg = XMLObj.build_from_str("<ver v='"+self.VER+"'/>")
@@ -443,7 +511,3 @@ class SmartFoxClient(SFSEventDispatcher):
         self.print_debug("[Received] "+str(data))
         self.handleMessage(data)
         return
-
-if __name__ == "__main__":
-    sfc = SmartFoxClient(True)
-    sfc.connect("174.37.230.155", 9449)

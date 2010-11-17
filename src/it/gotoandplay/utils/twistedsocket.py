@@ -7,15 +7,21 @@ Created on 2010-11-12
 
 from twisted.internet import protocol
 from twisted.internet import reactor
-from it.gotoandplay.utils.threadevent import ThreadEvent
 
 class SocketClientProtocol(protocol.Protocol):
+
+    received_data = ""
+
     def connectionMade(self):
         self.factory.handleEvent("onConnection", self)
         return
 
     def dataReceived(self, data):
-        self.factory.handleEvent("onDataReceived", data)
+        self.received_data += data
+        if self.received_data[-1] == "\0":
+            data = self.received_data
+            self.received_data = ""
+            self.factory.handleEvent("onDataReceived", data[:-1])
         return
 
 class SocketClientFactory(protocol.ClientFactory):

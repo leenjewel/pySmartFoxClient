@@ -37,8 +37,3 @@ class XMLSocket(object):
     def addEventListener(self, event_obj):
         self.event_obj = event_obj
         return
-
-
-if __name__ == "__main__":
-    xml_client = XMLSocket()
-    xml_client.connect("174.37.230.155", 9449)
