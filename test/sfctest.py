@@ -17,7 +17,7 @@ class SFSClient(object):
     _sfs_port = 9449
     _api_url = "http://yuanpeng.haalee.com/"
     _user_id = "1835554439"
-    _session_value = "1d34e96f19c4b3b804f7c52ee463a4c8"
+    _session_value = "de29331d96b60c6793924d2df6884e47"
     _event_handles = (SFSEvent.onLogin, SFSEvent.onRandomKey, SFSEvent.onExtensionResponse, SFSEvent.onConnection, 
                       SFSEvent.onRoomListUpdate,)
     
@@ -66,17 +66,6 @@ class SFSClient(object):
             func = getattr(self, _cmd)
             return func(params)
         return
-    
-    def onRoomListUpdate(self, evt):
-        print evt.getParams().get("roomList")
-        return
-    
-    def logOK(self, params):
-        try:
-            print params.get("err")
-        except:
-            print "OK"
-        return
 
 class TexasClient(SFSClient):
     def __init__(self, debug):
@@ -87,8 +76,16 @@ class TexasClient(SFSClient):
         return
     
     def onRoomListUpdate(self, evt):
-        self.room_list = evt.getParams().get("roomList")
-        print self.room_list
+        print evt.getParams().get("roomList")
+        room_id = raw_input("join_room:")
+        self.sfc.joinRoom(int(room_id))
+        return
+    
+    def onRoomVariablesUpdate(self, evt):
+        join_room = evt.getParams().get("room")
+        for vName, vValue in join_room.getVariables().items():
+            print vName, " | ", vValue
+        return
 
 if __name__ == "__main__":
     sfc = TexasClient(True)

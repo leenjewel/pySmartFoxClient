@@ -89,8 +89,8 @@ class XMLBase(object):
     xml_attr = property(get_attribute)
     
     def set_attribute(self, e_dict):
-        for key in e_dict.keys():
-            self.root_element.setAttribute(key, e_dict[key])
+        for attr_key, attr_value in e_dict.items():
+            self.root_element.setAttribute(str(attr_key), str(attr_value))
         return
 
     def add_element(self, e_name, e_dict = None, e_text = None):
@@ -163,9 +163,9 @@ class XMLObj(XMLBase):
     def __getattr__(self, attr):
         elements = self.get_elements(attr)
         if elements:
-            element = XMLObj(elements[0].root_element)
+            element = XMLObj(elements[0].root_element, self.xml_dom)
             for em in elements[1:]:
-                element.my_brothers.append(XMLObj(em.root_element))
+                element.my_brothers.append(XMLObj(em.root_element, self.xml_dom))
             return element
         else:
             return None

@@ -21,17 +21,17 @@ class Room(object):
     variables = None
 
     def __init__(self, id, name, maxUsers, maxSpectators, isTemp, isGame, isPrivate, isLimbo, userCount, specCount):
-        self.id = id
+        self.id = int(id)
         self.name = name
-        self.maxSpectators = maxSpectators
-        self.maxUsers = maxUsers
+        self.maxSpectators = int(maxSpectators)
+        self.maxUsers = int(maxUsers)
         self.temp = isTemp
         self.game = isGame
         self.priv = isPrivate
         self.limbo = isLimbo
 
-        self.userCount = userCount
-        self.specCount = specCount
+        self.userCount = int(userCount)
+        self.specCount = int(specCount)
         self.userList = {}
         self.variables = {}
 

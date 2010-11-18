@@ -316,7 +316,7 @@ class SmartFoxClient(SFSEventDispatcher):
     def getVersion(self):
         return ".".join([self.majVersion, self.minVersion, self.subVersion])
     
-    def joinRoom(self, newRoom, pword, isSpectator, dontLeave, oldRoom):
+    def joinRoom(self, newRoom, pword = "", isSpectator = False, dontLeave = False, oldRoom = -1):
         if isinstance(newRoom, basestring):
             nr = self.getRoomByName(newRoom)
             if not nr:

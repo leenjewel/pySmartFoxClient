@@ -75,7 +75,7 @@ class SysHandler(object):
         room_list = self.sfc.getAllRooms()
         rooms = xml_obj.body.rmList.rm
         for room in rooms:
-            room_id = room.xml_attr.get("id","-1")
+            room_id = int(room.xml_attr.get("id",-1))
             room_name = room.xml_attr.get("n","")
             maxu = room.xml_attr.get("maxu", 0)
             maxs = room.xml_attr.get("maxs",0)
@@ -121,21 +121,22 @@ class SysHandler(object):
         if xml_obj.body.vars and xml_obj.body.vars.var:
             currRoom.clearVariables()
             self.populateVariables(currRoom.getVariables(), xml_obj)
-        for usr in xml_obj.body.uLs.u:
-            name = usr.n.get_data()
-            id = int(usr.xml_attr.get("i", -1))
-            mod = int(usr.xml_attr.get("m", 0))
-            spec = int(usr.xml_attr.get("s", 0))
-            isMod = (mod == 1)
-            isSpec = (spec == 1)
-            pId = int(usr.xml_attr.get("p", -1))
-            user = User(id, name)
-            user.setModerator(isMod)
-            user.setIsSpectator(isSpec)
-            user.setPlayerId(pId)
-            if usr.vars and usr.vars.var:
-                self.populateVariables(user.getVariables(), usr)
-            currRoom.addUser(user, id)
+        if xml_obj.body.uLs.u:
+            for usr in xml_obj.body.uLs.u:
+                name = usr.n.get_data()
+                id = int(usr.xml_attr.get("i", -1))
+                mod = int(usr.xml_attr.get("m", 0))
+                spec = int(usr.xml_attr.get("s", 0))
+                isMod = (mod == 1)
+                isSpec = (spec == 1)
+                pId = int(usr.xml_attr.get("p", -1))
+                user = User(id, name)
+                user.setModerator(isMod)
+                user.setIsSpectator(isSpec)
+                user.setPlayerId(pId)
+                if usr.vars and usr.vars.var:
+                    self.populateVariables(user.getVariables(), usr)
+                currRoom.addUser(user, id)
         self.sfc.changingRoom = False
         evt = SFSEvent.build_evt(SFSEvent.onJoinRoom, {"room":currRoom})
         self.sfc.dispatchEvent(evt)
