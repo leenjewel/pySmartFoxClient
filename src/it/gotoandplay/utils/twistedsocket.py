@@ -18,10 +18,10 @@ class SocketClientProtocol(protocol.Protocol):
 
     def dataReceived(self, data):
         self.received_data += data
-        if self.received_data[-1] == "\0":
-            data = self.received_data
-            self.received_data = ""
-            self.factory.handleEvent("onDataReceived", data[:-1])
+        datas = self.received_data.split("\0")
+        self.received_data = datas[-1]
+        for data in datas[:-1]:
+            self.factory.handleEvent("onDataReceived", data)
         return
 
 class SocketClientFactory(protocol.ClientFactory):

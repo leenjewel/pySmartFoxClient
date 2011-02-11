@@ -329,6 +329,7 @@ class SysHandler(object):
         user = body.user
         userId = int(user.xml_attr.get("id", -1))
         returnUser = None
+        changedVars = None
         if body.vars and body.vars.var:
             for room in self.sfc.getAllRooms().values():
                 varOwner = room.getUser(userId)

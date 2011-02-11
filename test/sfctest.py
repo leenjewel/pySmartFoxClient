@@ -13,10 +13,10 @@ from it.gotoandplay.smartfoxclient import SmartFoxClient
 from it.gotoandplay.smartfoxclient.sfsevent import SFSEvent
 
 class SFSClient(object):
-    _sfs_host = "174.37.230.155"
-    _sfs_port = 9449
-    _api_url = "http://yuanpeng.haalee.com/"
-    _user_id = "1835554439"
+    _sfs_host = "122.147.45.134"
+    _sfs_port = 9339
+    _api_url = "http://web.thpoker.snsplus.com"
+    _user_id = "bot1835554439"
     _session_value = "de29331d96b60c6793924d2df6884e47"
     _event_handles = (SFSEvent.onLogin, SFSEvent.onRandomKey, SFSEvent.onExtensionResponse, SFSEvent.onConnection, 
                       SFSEvent.onRoomListUpdate,)
@@ -50,7 +50,7 @@ class SFSClient(object):
     def onRandomKey(self, evt):
         self.random_key = evt.getParams().get("key")
         hash_key = md5.md5(self.random_key+"23njkcdp9u8").hexdigest()
-        passwd = "_".join([hash_key,'1',self._session_value, self._api_url,])
+        passwd = "_".join([hash_key,'9339',self._session_value, self._api_url,])
         self.sfc.login('texas', self._user_id, passwd)
         return
     
@@ -86,6 +86,23 @@ class TexasClient(SFSClient):
         for vName, vValue in join_room.getVariables().items():
             print vName, " | ", vValue
         return
+    
+    def onUserVariablesUpdate(self, evt):
+        print evt.getParams()
+        return
+    
+    def onJoinRoom(self, evt):
+        if evt.getParams().has_key("success"):
+            room = evt.getParams()["success"].get("room")
+            print "\n\n\n\n",room.__dict__.items()
+        return
+    
+    def __getattr__(self, attr):
+        print "\n#Server get a method %s.#\n" %(str(attr))
+        return self
+    
+    def __call__(self, *args, **kwargs):
+        print "\n#Server call a method and give params : #\n",args, "\n", kwargs
 
 if __name__ == "__main__":
     sfc = TexasClient(True)
