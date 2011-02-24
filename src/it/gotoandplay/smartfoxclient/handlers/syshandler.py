@@ -173,8 +173,8 @@ class SysHandler(object):
 
     def handle_userGone(self, xml_obj):
         roomId = int(xml_obj.body.xml_attr.get("r", -1))
-        user = xml_obj.body.u
-        userId = int(user.xml_attr.get("i", -1))
+        user = xml_obj.body.user
+        userId = int(user.xml_attr.get("id", -1))
         theRoom = self.sfc.getRoom(roomId)
         uName = theRoom.getUser(userId).getName()
         theRoom.removeUser(userId)

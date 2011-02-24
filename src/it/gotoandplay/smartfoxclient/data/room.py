@@ -63,8 +63,8 @@ class Room(object):
     def getUser(self, userName):
         if self.userList.has_key(userName):
             return self.userList[userName]
-        for user in self.userList:
-            if user.getName() == userName:
+        for userId, user in self.userList.items():
+            if userId == userName:
                 return user
         return
 

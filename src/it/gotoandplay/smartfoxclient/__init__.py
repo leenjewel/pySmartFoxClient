@@ -7,6 +7,7 @@ Created on 2010-11-8
 
 import time
 import json
+from xml.parsers.expat import ExpatError
 from it.gotoandplay.utils.xmlsocket import XMLSocket
 from it.gotoandplay.utils.xmllib import XMLObj
 from it.gotoandplay.smartfoxclient.sfseventdispatcher import SFSEventDispatcher
@@ -95,7 +96,11 @@ class SmartFoxClient(SFSEventDispatcher):
         return
     
     def xmlReceived(self, xml_str):
-        xml_obj = XMLObj.build_from_str(xml_str)
+        try:
+            xml_obj = XMLObj.build_from_str(xml_str)
+        except ExpatError:
+            self.print_debug("[ERROR] XML Error \n\t" + xml_str)
+            return
         header_id = xml_obj.xml_attr.get("t")
         if header_id and self.messageHandlers.has_key(header_id):
             handler = self.messageHandlers[header_id]
@@ -428,7 +433,7 @@ class SmartFoxClient(SFSEventDispatcher):
             jobj["p"] = paramsObj
             self.sendJson(json.dumps({"t":"xt","b":jobj}))
         elif sendType == "str":
-            hdr = self.MSG_STR.join(["xt", xtName, cmd, roomId]+paramsObj) + self.MSG_STR
+            hdr = self.MSG_STR.join([str(d) for d in ["xt", xtName, cmd, roomId]+paramsObj]) + self.MSG_STR
             self.sendString(hdr)
         return
     
